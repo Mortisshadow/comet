@@ -2,6 +2,14 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## [2.54.2](https://github.com/g0ldyy/comet/compare/v2.54.1...v2.54.2) (2026-06-15)
+
+
+### Bug Fixes
+
+* **ui:** Offcloud now uses an API key, not email:password ([a1c6323](https://github.com/g0ldyy/comet/commit/a1c6323e0d4ad85faa89b746fa11dafb2fcca8de))
+* **ui:** Offcloud now uses an API key, not email:password ([c617a16](https://github.com/g0ldyy/comet/commit/c617a16f5cb9b07e2d0642b9628a12d3d734aef4))
+
 ## [2.54.1](https://github.com/g0ldyy/comet/compare/v2.54.0...v2.54.1) (2026-04-27)
 
 
