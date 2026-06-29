@@ -531,22 +531,25 @@ class AnimeMapper:
 
                 fribb_batch = []
                 for entry in fribb_list:
-                    imdb_id = entry.get("imdb_id")
-                    if not imdb_id:
+                    imdb_ids = entry.get("imdb_id")
+                    if not imdb_ids:
                         continue
+                    if not isinstance(imdb_ids, list):
+                        imdb_ids = [imdb_ids]
 
                     for provider, key in _FRIBB_PROVIDER_ORDER:
                         val = entry.get(key)
                         if val:
                             found_entry_id = lookup_map.get(f"{provider}:{val}")
                             if found_entry_id is not None:
-                                fribb_batch.append(
-                                    {
-                                        "provider": "imdb",
-                                        "provider_id": imdb_id,
-                                        "entry_id": found_entry_id,
-                                    }
-                                )
+                                for single_imdb_id in imdb_ids:
+                                    fribb_batch.append(
+                                        {
+                                            "provider": "imdb",
+                                            "provider_id": str(single_imdb_id),
+                                            "entry_id": found_entry_id,
+                                        }
+                                    )
                                 break
 
                     if len(fribb_batch) >= _DB_CHUNK_SIZE:
