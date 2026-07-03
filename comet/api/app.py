@@ -44,9 +44,16 @@ class LoguruMiddleware(BaseHTTPMiddleware):
             raise
         finally:
             process_time = time.time() - start_time
+            from comet.core.logger import censor
+            path = request.url.path
+            path_parts = path.split("/")
+            for idx, part in enumerate(path_parts):
+                if len(part) > 20 and (part.isalnum() or "-" in part or "_" in part or "=" in part):
+                    path_parts[idx] = censor(part)
+            censored_path = "/".join(path_parts)
             logger.log(
                 "API",
-                f"{request.method} {request.url.path} - {response.status_code if 'response' in locals() else '500'} - {process_time:.2f}s",
+                f"{request.method} {censored_path} - {response.status_code if 'response' in locals() else '500'} - {process_time:.2f}s",
             )
         return response
 

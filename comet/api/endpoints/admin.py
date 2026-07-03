@@ -294,8 +294,12 @@ async def admin_api_metrics(
     ):
         return JSONResponse(orjson.loads(cached_metrics["payload_json"]))
 
-    # 📊 TORRENTS METRICS
-    total_torrents = await database.fetch_val("SELECT COUNT(*) FROM torrents")
+    if settings.DATABASE_TYPE == "postgresql":
+        total_torrents = await database.fetch_val(
+            "SELECT reltuples::bigint FROM pg_class WHERE relname = 'torrents'"
+        )
+    else:
+        total_torrents = await database.fetch_val("SELECT COUNT(*) FROM torrents")
 
     # Torrents by tracker
     top_trackers = await database.fetch_all("""

@@ -129,6 +129,15 @@ class CinemataClient:
         videos = data.get("meta", {}).get("videos", [])
         seen = set()
         for video in videos:
+            released = video.get("released")
+            if released:
+                try:
+                    episode_year = int(released[:4])
+                    if episode_year < 2025:
+                        continue
+                except (ValueError, TypeError):
+                    pass
+
             season = video.get("season")
             episode = video.get("episode", video.get("number"))
             if season is None or episode is None:

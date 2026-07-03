@@ -164,16 +164,38 @@ def censor(text: str):
 def censor_url(url: str):
     if not url:
         return url
-    if "://" in url:
-        try:
+    from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
+    try:
+        if "://" in url:
             scheme, rest = url.split("://", 1)
             if "@" in rest:
                 auth, host = rest.split("@", 1)
                 if ":" in auth:
                     user, password = auth.split(":", 1)
                     return f"{scheme}://{user}:{censor(password)}@{host}"
-        except Exception:
-            pass
+
+        parsed = urlparse(url)
+        query_params = parse_qsl(parsed.query, keep_blank_values=True)
+        censored_params = []
+        sensitive_keys = {"key", "token", "password", "secret", "api"}
+        for k, v in query_params:
+            if any(sk in k.lower() for sk in sensitive_keys) and v:
+                v = censor(v)
+            censored_params.append((k, v))
+
+        path_parts = parsed.path.split("/")
+        for idx, part in enumerate(path_parts):
+            if len(part) > 20 and (part.isalnum() or "-" in part or "_" in part or "=" in part):
+                path_parts[idx] = censor(part)
+
+        censored_path = "/".join(path_parts)
+        rebuilt_url = parsed._replace(
+            path=censored_path,
+            query=urlencode(censored_params)
+        )
+        return urlunparse(rebuilt_url)
+    except Exception:
+        pass
     return url
 
 

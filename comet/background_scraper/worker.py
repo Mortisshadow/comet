@@ -938,9 +938,19 @@ class BackgroundScraperWorker:
         if not media_id or not title:
             return None
 
+        genres = media_item.get("genres") or []
+        blocked_genres = {"Reality-TV", "Talk-Show", "Game-Show", "News"}
+        if any(genre in blocked_genres for genre in genres):
+            return None
+
         year_source = media_item.get("year") or media_item.get("releaseInfo")
         year, year_end = parse_year_range(year_source)
         if year is None:
+            return None
+
+        if media_type == "movie" and year < 2025:
+            return None
+        elif media_type == "series" and year < 2025 and year_end is not None:
             return None
 
         return {
